@@ -40,3 +40,11 @@ jobs:
       - name: Run tests
         run: |
           make test
+
+      - name: "call action"
+        id: last_release
+        uses: InsonusK/get-latest-release@v1.0.1
+        with:
+          myToken: ${{ github.token }}
+          exclude_types: "release"
+          view_top: 1
