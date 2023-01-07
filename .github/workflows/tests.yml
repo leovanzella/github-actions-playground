@@ -1,0 +1,42 @@
+name: pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.9.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.7
+
+      - name: Cache/Restore dependencies
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+
+      - name: Setup env
+        run: |
+          pip install pipenv==2022.5.2
+
+      - name: Setup dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --dev
+
+      - name: Run tests
+        run: |
+          make test
